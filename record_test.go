@@ -33,8 +33,8 @@ func ExampleS_autoquote() {
 
 func ExampleS_Duration() {
 	Default = New(os.Stdout)
-	V("load", 25*time.Microsecond).D("size", 523).V("cplx", 1+2i).Log()
-	//Output: cplx=(1+2i) load=25µs size=523
+	V("load", 25*time.Millisecond).D("size", 523).V("cplx", 1+2i).Log()
+	//Output: cplx=(1+2i) load=25ms size=523
 }
 
 func ExampleT() {
