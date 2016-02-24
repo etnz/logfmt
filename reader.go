@@ -33,6 +33,9 @@ type Reader interface {
 // NewReader instanciate a new Reader
 func NewReader(r io.Reader) Reader { return newScanner(r) }
 
+// Parse a single record as string.
+func Parse(src string) (rec Record, err error) { return newScannerS(src).Next() }
+
 func newScannerS(str string) *scanner { return newScanner(strings.NewReader(str)) }
 
 func newScanner(r io.Reader) *scanner {
@@ -54,6 +57,7 @@ func (s *scanner) Read() (r rune) {
 	r, _, s.err = s.ReadRune()
 	if r == eof {
 		s.eof = true
+		s.err = nil
 	}
 	return
 }
