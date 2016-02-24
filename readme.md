@@ -1,12 +1,7 @@
 [![Travis](https://travis-ci.org/etnz/logfmt.svg?branch=master)](https://travis-ci.org/etnz/logfmt.svg?branch=master)
 [![GoDoc](https://godoc.org/github.com/etnz/logfmt?status.svg)](https://godoc.org/github.com/etnz/logfmt)
 
-golang package 'logfmt' implements a logfmt Record reader and writer.
-
-
-To write logfmt
-
-
+golang package 'logfmt' implements a logfmt Reader, Writer, query language, and a grep-like filter.
 
 
 
