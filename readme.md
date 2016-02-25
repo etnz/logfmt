@@ -1,14 +1,17 @@
-[![Travis](https://travis-ci.org/etnz/logfmt.svg?branch=master)](https://travis-ci.org/etnz/logfmt.svg?branch=master)
-[![GoDoc](https://godoc.org/github.com/etnz/logfmt?status.svg)](https://godoc.org/github.com/etnz/logfmt)
+#logfmt [![Travis](https://travis-ci.org/etnz/logfmt.svg?branch=master)](https://travis-ci.org/etnz/logfmt.svg?branch=master) [![GoDoc](https://godoc.org/github.com/etnz/logfmt?status.svg)](https://godoc.org/github.com/etnz/logfmt)
 
-golang package 'logfmt' implements a logfmt Reader, Writer, query language, and a grep-like filter.
-
-
-
-See [Examples](https://godoc.org/github.com/etnz/logfmt#pkg-examples) or directly the [godoc](https://godoc.org/github.com/etnz/logfmt) for more details.
+- "logfmt" is a golang package for logging objects in [logfmt](https://brandur.org/logfmt) format: [details](#logfmt)
+- "logfmt/reader" is a golang package to parse logfmt streams: [details](./reader/)
+- "logfmt/ql" is a golang package that contains the definition of a query language on top of logfmt records. [details](./ql)
+- "logfmt/cmd" is a collection of command line utilities for working with logfmt, it complements brandur's own [collection](https://github.com/brandur/hutils). [details](./cmd)
 
 
-# logfmt Writer
+
+
+
+
+#logfmt
+
 
 To use the package:
 
@@ -19,30 +22,76 @@ logfmt is defined in [Brandur's blog](https://brandur.org/logfmt) as a logging f
 for easy development, consistency, and good legibility for humans and
 computers.
 
-    at=info method=GET path=/ host=mutelight.org fwd="124.133.52.161"
-    dyno=web.2 connect=4ms service=8ms status=200 bytes=1653
+    at=info method=GET path=/ host=mutelight.org status=200
 
 The example above can be generated like:
 
 ```go
-logfmt.S("at", "info").
+logfmt.
+  S("at", "info").
   S("method",r.Method).
   S("path", r.URL.Path).
-  Q("fwd", "124.133.52.161").
-  V("service", time.Since(begin) )
   D("status", code ).
   Log()
 ```
 
-Where 'S', 'Q', 'D' are the usual 'fmt' verbs.
+Where 'S', 'Q', 'D' are method mapping the usual 'fmt' verbs.
 
-The keys are not generated at random, but in significance order: the shortest key is considered to be the most generic one, and then, come first.
+Key/Value are stored in a map, so it's ok to call S("at", "info") several time, the last one is always right.
+
+When writing the line in the output stream, keys are not generated at *random*. Logs would be hard to read, and not reproducible. 
+Instead key/value pairs are sorted in *significance* order: the shortest keys first, then alphabetically
+
+ 
+    at=info path=/ host=mutelight.org method=GET status=200
+
+It enforce the tendency to keep generic keys short, and specific one longer, the first information you read is the most important.
+
+Usually it is faster than the default "log" package
+
+```go
+    r := Rec()
+    r.D("timestamp", int(n))
+    r.D("at", i)
+    r.Q("username", "eric")
+    r.K("debug")
+    r.Log()
+```
+At 1389 ns/op  : 720 logs per milliseconds
+
+```go    
+     log.Printf("at=%d", i)
+     log.Printf("debug")
+     log.Printf("username=%q\n", "eric")
+```
+At 2248 ns/op, that is 445 logs per milliseconds
+
+Because using logfmt, you tend to group together information in less records, but richer.
+
+
+Record  object is idiomatic:
+
+```go
+log:= logfmt.Rec()
+defer log.Log()
+//set an initial value
+r.S("level", "debug")
+...
+if err != nil{
+  r.S("level", "error") // escalate the record
+  r.V("err", err)
+}
+
+```
+
 
 See [Examples](https://godoc.org/github.com/etnz/logfmt#pkg-examples) or directly the [godoc](https://godoc.org/github.com/etnz/logfmt) for more details.
 
-# logfmt Reader
 
-the same package offers a parser to read streams in logfmt, one record at a time.
+
+# Reader
+
+The same package offers a parser to read streams in logfmt, one record at a time.
 
 ```go
 r := NewReader(src)
@@ -51,6 +100,11 @@ for r.HasNext() {
 	fmt.Println(rec)
 }
 ```
+
+# ql
+# cmd
+
+
 
 A 'rec' beeing a `map[string]*string`
 
@@ -90,9 +144,9 @@ Logic arithmetic: Comparisons and matchings can be combined using usual boolean 
       query    .user ~ /john.*/ and .age < 40
       result   true
 
-  'AND' operator has priority over 'OR'
+'AND' operator has priority over 'OR'
 
-      '.a OR .b AND .c' is equivalent to '.a  OR  ( .b  AND  .c )'
+`.a OR .b AND .c` is equivalent to `.a  OR  ( .b  AND  .c )`
 
 Space delimiter: logfmt keys can be anything but ' ', therefore key names *must* be delimited by space.
 
@@ -106,7 +160,7 @@ Be careful.
 
     go get github.com/etnz/logfmt/cmd/lrep
 
-`lrep` is a simple command line that filter a logfmt stream using query
+`lrep` is a simple command line that filters a logfmt stream using query
 
     $ cat server.log
     

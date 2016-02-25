@@ -1,4 +1,4 @@
-package logfmt
+package reader
 
 import (
 	"bufio"
@@ -6,6 +6,8 @@ import (
 	"errors"
 	"io"
 	"strings"
+
+	"github.com/etnz/logfmt"
 )
 
 const (
@@ -27,14 +29,14 @@ type scanner struct {
 //Reader reads from any source successives records
 type Reader interface {
 	HasNext() bool
-	Next() (rec Record, err error)
+	Next() (rec logfmt.Record, err error)
 }
 
 // NewReader instanciate a new Reader
 func NewReader(r io.Reader) Reader { return newScanner(r) }
 
 // Parse a single record as string.
-func Parse(src string) (rec Record, err error) { return newScannerS(src).Next() }
+func Parse(src string) (rec logfmt.Record, err error) { return newScannerS(src).Next() }
 
 func newScannerS(str string) *scanner { return newScanner(strings.NewReader(str)) }
 
@@ -70,8 +72,8 @@ func (s *scanner) Unread() {
 // Next read runes until it has found a full Record, returns it.
 //
 // If the source has errors it returns it
-func (s *scanner) Next() (record Record, err error) {
-	rec := Rec()
+func (s *scanner) Next() (record logfmt.Record, err error) {
+	rec := logfmt.Rec()
 	for {
 
 		if r := s.Read(); r == eol || r == eof {

@@ -13,7 +13,13 @@ func BenchmarkLogger(b *testing.B) {
 	Default = New(&buf)
 	for i := 0; i < b.N; i++ {
 		n := time.Now().Unix()
-		D("timestamp", int(n)).D("at", i).Q("username", "eric").K("debug").Log()
+		r := Rec()
+
+		r.D("timestamp", int(n))
+		r.D("at", i)
+		r.Q("username", "eric")
+		r.K("debug")
+		r.Log()
 	}
 }
 

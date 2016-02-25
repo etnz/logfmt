@@ -52,26 +52,47 @@ func (rec *Record) Q(key, val string) *Record {
 // 'val' format is checked and quoted if needed.
 func (rec *Record) S(key, val string) *Record {
 
-	//check the validity of val
-	var eos rune
-	s := newScannerS(val)
-	if r := s.Read(); r == '"' { //it will be a string
-		s.Str()
-		end := s.Read() //read the " //it must be a quote
-		if end != '"' {
-			return Q(key, val) //quote it
+	buf := bytes.NewBuffer([]byte(val))
+	r, _, _ := buf.ReadRune()
+
+	// either 'val' is correct:
+	//      - it's a string literal (it starts with a ")
+	//      - it's an identifier (no spaces)
+	// OR: 'val' is not correct and it need to be escaped
+	eof := '\x00'
+	if r == '"' { //it should  be a string
+		for r, _, _ = buf.ReadRune(); r != eof && r != '"'; r, _, _ = buf.ReadRune() {
+			if r == '\\' {
+				r, _, _ = buf.ReadRune() // always read the next after \ whatever it is
+				if !(r == 'a' || r == 'b' || r == 'f' || r == 'n' || r == 'r' || r == 't' || r == 'v') {
+					// not a valid escape char
+					return Q(key, val)
+				}
+			}
 		}
-		//ok it's valid str
-		eos = s.Read() // read one more (must be eof)
-	} else {
-		s.Unread()     //unread the first char
-		s.Identifier() //read the identifier
-		eos = s.Read() // read the next, must be eof
+		//end of the string or the src? that is the question, I MUST match the end of string, and then the end of file
+		if r == eof {
+			// this is an error //Escape the code
+			return Q(key, val)
+		} // r must be " this is the only possible other outcome, but now it must be the latest value
+		r, _, _ = buf.ReadRune()
+		if r != eof { // oups, there is extra stuff after the end '"'
+			return Q(key, val)
+		}
+		//valid string, no escape needed
+
+	} else { // this is the other possible case: 'val' has to be a a valid identifier
+		//read until it finds the eof or ' '
+		for r, _, _ = buf.ReadRune(); r != eof && r > ' '; r, _, _ = buf.ReadRune() {
+		}
+
+		// now the only valid outcome is to end on eof, because space is not allowed
+		if r != eof {
+			return Q(key, val)
+		}
+		// valid identifier no escape needed
 	}
-	if eos != eof {
-		//there are extra stuff, this is not a valid value
-		return Q(key, val)
-	}
+	// default situation, no escape needed,all other cases have been taken into account
 	return rec.set(key, &val)
 }
 
