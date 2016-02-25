@@ -1,9 +1,10 @@
-# logfmt/reader
+package logreader
 
+import (
+	"fmt"
+	"strings"
+)
 
-'reader' package implements a parser to read streams in logfmt, one record at a time.
-
-```go
 func ExampleReader() {
 
 	src := `at=1234578 debug path=/login user="foo@bar.com"
@@ -11,7 +12,7 @@ func ExampleReader() {
 	at=1234599 debug path=/login user="baz@bar.com"
 	`
 
-	r := NewReader(strings.NewReader(src))
+	r := New(strings.NewReader(src))
 	for r.HasNext() {
 		rec, _ := r.Next()
 		fmt.Println(rec)
@@ -21,4 +22,3 @@ func ExampleReader() {
 	// at=1234589 path=/login user=bar@bar.com debug
 	// at=1234599 path=/login user=baz@bar.com debug
 }
-```

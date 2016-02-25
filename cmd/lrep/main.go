@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/etnz/logfmt"
+	"github.com/etnz/logfmt/logreader"
 	"github.com/etnz/logfmt/ql"
 )
 
@@ -46,7 +47,7 @@ func main() {
 	}
 
 	//and now read from the stdin for logfmt
-	reader := logfmt.NewReader(os.Stdin)
+	reader := logreader.New(os.Stdin)
 	for reader.HasNext() {
 		//read the next record
 		rec, err := reader.Next()

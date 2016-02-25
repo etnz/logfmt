@@ -1,4 +1,4 @@
-package reader
+package logreader
 
 import (
 	"bufio"
@@ -32,8 +32,8 @@ type Reader interface {
 	Next() (rec logfmt.Record, err error)
 }
 
-// NewReader instanciate a new Reader
-func NewReader(r io.Reader) Reader { return newScanner(r) }
+// New instanciate a new Reader
+func New(r io.Reader) Reader { return newScanner(r) }
 
 // Parse a single record as string.
 func Parse(src string) (rec logfmt.Record, err error) { return newScannerS(src).Next() }

@@ -14,7 +14,6 @@ func BenchmarkLogger(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		n := time.Now().Unix()
 		r := Rec()
-
 		r.D("timestamp", int(n))
 		r.D("at", i)
 		r.Q("username", "eric")

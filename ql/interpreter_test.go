@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/etnz/logfmt"
+	"github.com/etnz/logfmt/logreader"
 )
 
 var (
@@ -62,7 +62,7 @@ func TestCases(t *testing.T) {
 
 	for _, c := range cases {
 
-		rec, err := logfmt.Parse(c.rec)
+		rec, err := logreader.Parse(c.rec)
 		if err != nil {
 			t.Fatalf("Invalid record in test %v: %v", c, err)
 			return
