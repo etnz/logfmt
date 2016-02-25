@@ -1,9 +1,9 @@
 #logfmt [![Travis](https://travis-ci.org/etnz/logfmt.svg?branch=master)](https://travis-ci.org/etnz/logfmt?branch=master) [![GoDoc](https://godoc.org/github.com/etnz/logfmt?status.svg)](https://godoc.org/github.com/etnz/logfmt)
 
-- "logfmt" is a golang package for logging objects in [logfmt](https://brandur.org/logfmt) format: [details](#logfmt)
-- "logfmt/reader" is a golang package to parse logfmt streams: [details](./reader/)
-- "logfmt/ql" is a golang package that contains the definition of a query language on top of logfmt records. [details](./ql)
-- "logfmt/cmd" is a collection of command line utilities for working with logfmt, it complements brandur's own [collection](https://github.com/brandur/hutils). [details](./cmd)
+- Package "logfmt" implements a logger for objects in [logfmt](https://brandur.org/logfmt) format: [details](#logfmt)
+- Package "logfmt/logreader" implements a parser for logfmt streams: [details](./logreader/)
+- Package "logfmt/ql" implements an interpreter of a query language for logfmt records. [details](./ql)
+- Package "logfmt/cmd" is a collection of command line utilities for working with logfmt, it complements brandur's own [collection](https://github.com/brandur/hutils). [details](./cmd)
 
 
 
