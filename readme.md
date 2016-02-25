@@ -39,7 +39,7 @@ Where 'S', 'Q', 'D' are method mapping the usual 'fmt' verbs.
 
 Key/Value are stored in a map, so it's ok to call S("at", "info") several time, the last one is always right.
 
-When writing the line in the output stream, keys are not generated at *random*. Logs would be hard to read, and not reproducible. 
+When writing the line in the output stream, keys are not printed in *random* order. Logs would be hard to read, and not reproducible. 
 Instead key/value pairs are sorted in *significance* order: the shortest keys first, then alphabetically
 
  
@@ -66,10 +66,10 @@ At 1389 ns/op  : 720 logs per milliseconds
 ```
 At 2248 ns/op, that is 445 logs per milliseconds
 
-Because using logfmt, you tend to group together information in less records, but richer.
+Because using logfmt, you tend to group together information in less records, but richer, I compared a single logfmt record with 4 attributes with a 3 default logs.
 
 
-Record  object is idiomatic:
+'Record' object is idiomatic:
 
 ```go
 log:= logfmt.Rec()
